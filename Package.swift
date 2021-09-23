@@ -7,17 +7,17 @@ let package = Package(
     name: "Secp256k1.swift",
     products: [
         .library(
-            name: "Secp256k1.swift",
-            targets: ["Secp256k1.swift"]),
+            name: "Secp256k1Swift",
+            targets: ["Secp256k1Swift"]),
     ],
     dependencies: [
     ],
     targets: [
         .target(
-            name: "Secp256k1.swift",
+            name: "Secp256k1Swift",
             dependencies: []),
         .testTarget(
-            name: "Secp256k1.swiftTests",
-            dependencies: ["Secp256k1.swift"]),
+            name: "Secp256k1SwiftTests",
+            dependencies: ["Secp256k1Swift"]),
     ]
 )
