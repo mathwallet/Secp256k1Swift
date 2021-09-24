@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Secp256k1.swift",
+    name: "Secp256k1Swift",
     products: [
         .library(
             name: "Secp256k1Swift",
