@@ -13,8 +13,8 @@ let package = Package(
             name: "Secp256k1Swift",
             targets: ["Secp256k1Swift"]),
         .library(
-            name: "BIP32",
-            targets: ["BIP32"]),
+            name: "BIP32Swift",
+            targets: ["BIP32Swift"]),
     ],
     dependencies: [
         .package(url: "https://github.com/attaswift/BigInt.git", from: "5.0.0"),
@@ -28,7 +28,7 @@ let package = Package(
             name: "Secp256k1Swift",
             dependencies: ["CSecp256k1"]),
         .target(
-            name: "BIP32",
+            name: "BIP32Swift",
             dependencies: ["Secp256k1Swift", "BigInt", "CryptoSwift"]),
         .testTarget(
             name: "CSecp256k1Tests",
@@ -37,7 +37,7 @@ let package = Package(
             name: "Secp256k1SwiftTests",
             dependencies: ["Secp256k1Swift"]),
         .testTarget(
-            name: "BIP32Tests",
-            dependencies: ["Secp256k1Swift","BIP32"]),
+            name: "BIP32SwiftTests",
+            dependencies: ["Secp256k1Swift","BIP32Swift"]),
     ]
 )
