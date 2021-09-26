@@ -7,7 +7,7 @@
 
 import Foundation
 
-public extension Data {
+extension Data {
     static func fromHex(_ hex: String) -> Data? {
         let string = hex.lowercased().stripHexPrefix()
         let array = Array<UInt8>(hex: string)
