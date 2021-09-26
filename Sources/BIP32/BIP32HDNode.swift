@@ -86,7 +86,7 @@ public class HDNode {
         chaincode = data[13..<45]
         if serializePrivate {
             privateKey = data[46..<78]
-            guard let pubKey = HDNode.privateToPublic(privateKey!, compressed: true) else {return nil}
+            guard let pubKey = SECP256K1.privateToPublic(privateKey: privateKey!, compressed: true) else {return nil}
             if pubKey[0] != 0x02 && pubKey[0] != 0x03 {return nil}
             publicKey = pubKey
         } else {
@@ -114,12 +114,6 @@ public class HDNode {
         privateKey = privKeyCandidate
         depth = 0x00
         childNumber = UInt32(0)
-    }
-    
-    /// Convert the private key (32 bytes of Data) to compressed (33 bytes) or non-compressed (65 bytes) public key.
-    private static func privateToPublic(_ privateKey: Data, compressed: Bool = false) -> Data? {
-        guard let publicKey = SECP256K1.privateToPublic(privateKey:  privateKey, compressed: compressed) else {return nil}
-        return publicKey
     }
     
     private static var curveOrder = BigUInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", radix: 16)!
