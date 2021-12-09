@@ -399,7 +399,7 @@ public struct RIPEMD160 {
 
 }
 
-extension RIPEMD160 {
+public extension RIPEMD160 {
     
     static func hash(message: Data) throws -> Data {
         var md = RIPEMD160()
@@ -414,7 +414,7 @@ extension RIPEMD160 {
     }
 }
 
-extension RIPEMD160 {
+public extension RIPEMD160 {
     
     static func hmac(key: Data, message: Data) throws -> Data {
         
