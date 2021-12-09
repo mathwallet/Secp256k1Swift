@@ -9,12 +9,12 @@
 
 import Foundation
 
-enum RIPEMD160Error: Error {
+public enum RIPEMD160Error: Error {
     case dataError
     case unknownError
 }
 
-struct RIPEMD160 {
+public struct RIPEMD160 {
     
     private var MDbuf: (UInt32, UInt32, UInt32, UInt32, UInt32)
     private var buffer: Data
