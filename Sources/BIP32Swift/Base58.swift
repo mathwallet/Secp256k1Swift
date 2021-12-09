@@ -6,7 +6,7 @@
 
 import Foundation
 
-struct Base58 {
+public struct Base58 {
     static let base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
     
     // Encode
@@ -115,7 +115,7 @@ struct Base58 {
 
 
 
-extension Array where Element == UInt8 {
+public extension Array where Element == UInt8 {
     public var base58EncodedString: String {
         guard !self.isEmpty else { return "" }
         return Base58.base58FromBytes(self)
@@ -131,7 +131,7 @@ extension Array where Element == UInt8 {
     }
 }
 
-extension String {
+public extension String {
     var base58EncodedString: String {
         return [UInt8](utf8).base58EncodedString
     }
