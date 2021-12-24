@@ -26,7 +26,7 @@ public struct SECP256K1 {
 extension SECP256K1 {
     static let context = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_SIGN|SECP256K1_CONTEXT_VERIFY))
     
-    public static func signForRecovery(hash: Data, privateKey: Data, useExtraEntropy: Bool = false) -> (serializedSignature:Data?, rawSignature: Data?) {
+    public static func signForRecovery(hash: Data, privateKey: Data, useExtraEntropy: Bool = false, useExtraVer: Bool = true) -> (serializedSignature:Data?, rawSignature: Data?) {
         if (hash.count != 32 || privateKey.count != 32) {return (nil, nil)}
         if !SECP256K1.verifyPrivateKey(privateKey: privateKey) {
             return (nil, nil)
@@ -40,7 +40,7 @@ extension SECP256K1 {
             if !SECP256K1.constantTimeComparison(Data(toByteArray(truePublicKey.data)), Data(toByteArray(recoveredPublicKey.data))) {
                 continue
             }
-            guard let serializedSignature = SECP256K1.serializeSignature(recoverableSignature: &recoverableSignature) else {continue}
+            guard let serializedSignature = SECP256K1.serializeSignature(recoverableSignature: &recoverableSignature, useExtraVer: useExtraVer) else {continue}
             let rawSignature = Data(toByteArray(recoverableSignature))
             return (serializedSignature, rawSignature)
         }
@@ -204,7 +204,7 @@ extension SECP256K1 {
         return recoverableSignature
     }
     
-    internal static func serializeSignature(recoverableSignature: inout secp256k1_ecdsa_recoverable_signature) -> Data? {
+    internal static func serializeSignature(recoverableSignature: inout secp256k1_ecdsa_recoverable_signature, useExtraVer: Bool = true) -> Data? {
         var serializedSignature = Data(repeating: 0x00, count: 64)
         var v: Int32 = 0
         let result = serializedSignature.withUnsafeMutableBytes { (serSignatureRawBufferPointer: UnsafeMutableRawBufferPointer) -> Int32? in
@@ -223,10 +223,11 @@ extension SECP256K1 {
         guard let res = result, res != 0 else {
             return nil
         }
+        
         if (v == 0 || v == 27 || v == 31 || v == 35) {
-            serializedSignature.append(0x1b)
+            serializedSignature.append(useExtraVer ? 0x1b : 0x00)
         } else if (v == 1 || v == 28 || v == 32 || v == 36) {
-            serializedSignature.append(0x1c)
+            serializedSignature.append(useExtraVer ? 0x1c : 0x01)
         } else {
             return nil
         }
