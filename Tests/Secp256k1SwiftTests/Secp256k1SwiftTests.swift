@@ -4,6 +4,6 @@ import XCTest
 final class Secp256k1SwiftTests: XCTestCase {
     
     func testExample() {
-        debugPrint(SECP256K1.generatePrivateKey() ?? Data())
+        debugPrint(SECP256K1.generatePrivateKey())
     }
 }
