@@ -8,6 +8,7 @@ import Foundation
 import BigInt
 import CryptoSwift
 import Secp256k1Swift
+import Base58Swift
 
 extension UInt32 {
     public func serialize32() -> Data {
@@ -26,8 +27,8 @@ extension UInt32 {
 
 public class HDNode {
     public struct HDversion{
-        public var privatePrefix: Data = Data.fromHex("0x0488ADE4")!
-        public var publicPrefix: Data = Data.fromHex("0x0488B21E")!
+        public var privatePrefix: Data = Data([0x04, 0x88, 0xAD, 0xE4])
+        public var publicPrefix: Data = Data([0x04, 0x88, 0xB2, 0x1E])
         public init() {
             
         }
@@ -100,7 +101,7 @@ public class HDNode {
     public init?(seed: Data) {
         guard seed.count >= 16 else {return nil}
         let hmacKey = "Bitcoin seed".data(using: .ascii)!
-        let hmac:Authenticator = HMAC(key: hmacKey.bytes, variant: HMAC.Variant.sha512)
+        let hmac:Authenticator = HMAC(key: hmacKey.bytes, variant: .sha2(.sha512))
         guard let entropy = try? hmac.authenticate(seed.bytes) else {return nil}
         guard entropy.count == 64 else { return nil}
         let I_L = entropy[0..<32]
@@ -135,7 +136,7 @@ extension HDNode {
                     if trueIndex < (UInt32(1) << 31) {
                         trueIndex = trueIndex + (UInt32(1) << 31)
                     }
-                    let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha512)
+                    let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha2(.sha512))
                     var inputForHMAC = Data()
                     inputForHMAC.append(Data([UInt8(0x00)]))
                     inputForHMAC.append(self.privateKey!)
@@ -145,7 +146,7 @@ extension HDNode {
                     entropy = ent
                 } else {
                     trueIndex = index
-                    let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha512)
+                    let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha2(.sha512))
                     var inputForHMAC = Data()
                     inputForHMAC.append(self.publicKey)
                     inputForHMAC.append(trueIndex.serialize32())
@@ -203,7 +204,7 @@ extension HDNode {
             if index >= (UInt32(1) << 31) || hardened {
                 return nil // no derivation of hardened public key from extended public key
             } else {
-                let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha512)
+                let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha2(.sha512))
                 var inputForHMAC = Data()
                 inputForHMAC.append(self.publicKey)
                 inputForHMAC.append(index.serialize32())

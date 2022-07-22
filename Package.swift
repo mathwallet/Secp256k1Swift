@@ -18,7 +18,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/attaswift/BigInt.git", from: "5.0.0"),
-        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.4.1")
+        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.4.1"),
+        .package(url: "https://github.com/mathwallet/Base58Swift.git", from: "0.0.1")
     ],
     targets: [
         .target(
@@ -29,7 +30,7 @@ let package = Package(
             dependencies: ["CSecp256k1"]),
         .target(
             name: "BIP32Swift",
-            dependencies: ["Secp256k1Swift", "BigInt", "CryptoSwift"]),
+            dependencies: ["Secp256k1Swift", "BigInt", "CryptoSwift", "Base58Swift"]),
         .testTarget(
             name: "CSecp256k1Tests",
             dependencies: ["CSecp256k1"]),

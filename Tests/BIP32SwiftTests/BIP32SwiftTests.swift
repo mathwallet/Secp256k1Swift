@@ -4,6 +4,7 @@ import XCTest
 
 final class BIP32SwiftTests: XCTestCase {
     func testExamples() {
-        debugPrint(HDNode(seed: SECP256K1.generatePrivateKey()!))
+        guard let n = HDNode(seed: SECP256K1.generatePrivateKey()!) else { return }
+        debugPrint(n)
     }
 }
