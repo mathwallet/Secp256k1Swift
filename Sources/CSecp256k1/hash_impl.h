@@ -146,6 +146,19 @@ static void secp256k1_sha256_write(secp256k1_sha256 *hash, const unsigned char *
     }
 }
 
+/* Initializes a sha256 struct and writes the 64 byte string
+ * SHA256(tag)||SHA256(tag) into it. */
+static void secp256k1_sha256_initialize_tagged(secp256k1_sha256 *hash, const unsigned char *tag, size_t taglen) {
+    unsigned char buf[32];
+    secp256k1_sha256_initialize(hash);
+    secp256k1_sha256_write(hash, tag, taglen);
+    secp256k1_sha256_finalize(hash, buf);
+
+    secp256k1_sha256_initialize(hash);
+    secp256k1_sha256_write(hash, buf, 32);
+    secp256k1_sha256_write(hash, buf, 32);
+}
+
 static void secp256k1_sha256_finalize(secp256k1_sha256 *hash, unsigned char *out32) {
     static const unsigned char pad[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint32_t sizedesc[2];

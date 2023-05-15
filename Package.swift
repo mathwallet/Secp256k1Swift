@@ -41,5 +41,8 @@ let package = Package(
         .testTarget(
             name: "BIP32SwiftTests",
             dependencies: ["Secp256k1Swift","BIP32Swift"]),
+        .testTarget(
+            name: "Secp256k1Sha256Test",
+            dependencies: ["CSecp256k1"]),
     ]
 )
