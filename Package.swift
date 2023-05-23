@@ -25,7 +25,17 @@ let package = Package(
     targets: [
         .target(
             name: "CSecp256k1",
-            dependencies: []),
+            dependencies: [],
+            cSettings: [
+                // Basic config values that are universal and require no dependencies.
+                .define("ECMULT_GEN_PREC_BITS", to: "4"),
+                .define("ECMULT_WINDOW_SIZE", to: "15"),
+                // Enabling additional secp256k1 modules.
+                .define("ENABLE_MODULE_ECDH"),
+                .define("ENABLE_MODULE_EXTRAKEYS"),
+                .define("ENABLE_MODULE_RECOVERY"),
+                .define("ENABLE_MODULE_SCHNORRSIG")
+            ]),
         .target(
             name: "Secp256k1Swift",
             dependencies: ["CSecp256k1"]),
@@ -43,6 +53,6 @@ let package = Package(
             dependencies: ["Secp256k1Swift","BIP32Swift"]),
         .testTarget(
             name: "Secp256k1Sha256Test",
-            dependencies: ["CSecp256k1"]),
+            dependencies: ["CSecp256k1"])
     ]
 )
