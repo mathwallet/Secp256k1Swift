@@ -79,9 +79,9 @@ public class HDNode {
         if header == HDNode.HDversion().privatePrefix {
             serializePrivate = true
         }
-        depth = data[4..<5].bytes[0]
+        depth = data[4..<5].byteArray[0]
         parentFingerprint = data[5..<9]
-        let cNum = data[9..<13].bytes
+        let cNum = data[9..<13].byteArray
         childNumber = UnsafePointer(cNum).withMemoryRebound(to: UInt32.self, capacity: 1) {
             $0.pointee
         }
@@ -102,8 +102,8 @@ public class HDNode {
     public init?(seed: Data) {
         guard seed.count >= 16 else {return nil}
         let hmacKey = "Bitcoin seed".data(using: .ascii)!
-        let hmac:Authenticator = HMAC(key: hmacKey.bytes, variant: .sha2(.sha512))
-        guard let entropy = try? hmac.authenticate(seed.bytes) else {return nil}
+        let hmac:Authenticator = HMAC(key: hmacKey.byteArray, variant: .sha2(.sha512))
+        guard let entropy = try? hmac.authenticate(seed.byteArray) else {return nil}
         guard entropy.count == 64 else { return nil}
         let I_L = entropy[0..<32]
         let I_R = entropy[32..<64]
@@ -111,7 +111,7 @@ public class HDNode {
         let privKeyCandidate = Data(I_L)
         guard SECP256K1.verifyPrivateKey(privateKey: privKeyCandidate) else {return nil}
         guard let pubKeyCandidate = SECP256K1.privateToPublic(privateKey: privKeyCandidate, compressed: true) else {return nil}
-        guard pubKeyCandidate.bytes[0] == 0x02 || pubKeyCandidate.bytes[0] == 0x03 else {return nil}
+        guard pubKeyCandidate.byteArray[0] == 0x02 || pubKeyCandidate.byteArray[0] == 0x03 else {return nil}
         publicKey = pubKeyCandidate
         privateKey = privKeyCandidate
         depth = 0x00
@@ -137,21 +137,21 @@ extension HDNode {
                     if trueIndex < (UInt32(1) << 31) {
                         trueIndex = trueIndex + (UInt32(1) << 31)
                     }
-                    let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha2(.sha512))
+                    let hmac:Authenticator = HMAC(key: self.chaincode.byteArray, variant: .sha2(.sha512))
                     var inputForHMAC = Data()
                     inputForHMAC.append(Data([UInt8(0x00)]))
                     inputForHMAC.append(self.privateKey!)
                     inputForHMAC.append(trueIndex.serialize32())
-                    guard let ent = try? hmac.authenticate(inputForHMAC.bytes) else {return nil }
+                    guard let ent = try? hmac.authenticate(inputForHMAC.byteArray) else {return nil }
                     guard ent.count == 64 else { return nil }
                     entropy = ent
                 } else {
                     trueIndex = index
-                    let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha2(.sha512))
+                    let hmac:Authenticator = HMAC(key: self.chaincode.byteArray, variant: .sha2(.sha512))
                     var inputForHMAC = Data()
                     inputForHMAC.append(self.publicKey)
                     inputForHMAC.append(trueIndex.serialize32())
-                    guard let ent = try? hmac.authenticate(inputForHMAC.bytes) else {return nil }
+                    guard let ent = try? hmac.authenticate(inputForHMAC.byteArray) else {return nil }
                     guard ent.count == 64 else { return nil }
                     entropy = ent
                 }
@@ -175,7 +175,7 @@ extension HDNode {
                 guard let privKeyCandidate = newPK.serialize().setLengthLeft(32) else {return nil}
                 guard SECP256K1.verifyPrivateKey(privateKey: privKeyCandidate) else {return nil }
                 guard let pubKeyCandidate = SECP256K1.privateToPublic(privateKey: privKeyCandidate, compressed: true) else {return nil}
-                guard pubKeyCandidate.bytes[0] == 0x02 || pubKeyCandidate.bytes[0] == 0x03 else {return nil}
+                guard pubKeyCandidate.byteArray[0] == 0x02 || pubKeyCandidate.byteArray[0] == 0x03 else {return nil}
                 guard self.depth < UInt8.max else {return nil}
                 let newNode = HDNode()
                 newNode.chaincode = cc
@@ -205,11 +205,11 @@ extension HDNode {
             if index >= (UInt32(1) << 31) || hardened {
                 return nil // no derivation of hardened public key from extended public key
             } else {
-                let hmac:Authenticator = HMAC(key: self.chaincode.bytes, variant: .sha2(.sha512))
+                let hmac:Authenticator = HMAC(key: self.chaincode.byteArray, variant: .sha2(.sha512))
                 var inputForHMAC = Data()
                 inputForHMAC.append(self.publicKey)
                 inputForHMAC.append(index.serialize32())
-                guard let ent = try? hmac.authenticate(inputForHMAC.bytes) else {return nil }
+                guard let ent = try? hmac.authenticate(inputForHMAC.byteArray) else {return nil }
                 guard ent.count == 64 else { return nil }
                 entropy = ent
             }
@@ -226,9 +226,9 @@ extension HDNode {
             guard let tempKey = bn.serialize().setLengthLeft(32) else {return nil}
             guard SECP256K1.verifyPrivateKey(privateKey: tempKey) else {return nil }
             guard let pubKeyCandidate = SECP256K1.privateToPublic(privateKey: tempKey, compressed: true) else {return nil}
-            guard pubKeyCandidate.bytes[0] == 0x02 || pubKeyCandidate.bytes[0] == 0x03 else {return nil}
+            guard pubKeyCandidate.byteArray[0] == 0x02 || pubKeyCandidate.byteArray[0] == 0x03 else {return nil}
             guard let newPublicKey = SECP256K1.combineSerializedPublicKeys(keys: [self.publicKey, pubKeyCandidate], outputCompressed: true) else {return nil}
-            guard newPublicKey.bytes[0] == 0x02 || newPublicKey.bytes[0] == 0x03 else {return nil}
+            guard newPublicKey.byteArray[0] == 0x02 || newPublicKey.byteArray[0] == 0x03 else {return nil}
             guard self.depth < UInt8.max else {return nil}
             let newNode = HDNode()
             newNode.chaincode = cc
@@ -272,7 +272,7 @@ extension HDNode {
     
     public func serializeToString(serializePublic: Bool = true, version: HDversion = HDversion()) -> String? {
         guard let data = self.serialize(serializePublic: serializePublic, version: version) else {return nil}
-        let encoded = Base58.base58FromBytes(data.bytes)
+        let encoded = Base58.base58FromBytes(data.byteArray)
         return encoded
     }
     
